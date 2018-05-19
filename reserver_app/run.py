@@ -1,5 +1,4 @@
 from flask import Flask
-from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 import datetime as dt
@@ -16,20 +15,19 @@ app.config['SECRET_KEY'] = 'jwt-some-secret'
 app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 
-api = Api(app)
+app.config['BUNDLE_ERRORS'] = True
+
+
+
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 
 from reserver_app import views, models, resources
+from reserver_app.auth.views import auth_blueprint
+from reserver_app.api.v1.users import api_v1_users_blueprint
 
-# TODO use blueprints /auth /api etc.
-api.add_resource(resources.UserRegistration, '/register')
-api.add_resource(resources.UserLogin, '/login')
-api.add_resource(resources.UserLogoutAccess, '/logout/access')
-api.add_resource(resources.UserLogoutRefresh, '/logout/refresh')
-api.add_resource(resources.TokenRefresh, '/token/refresh')
-api.add_resource(resources.AllUsers, '/users')
-api.add_resource(resources.ProtectedResourceExample, '/secret')
+app.register_blueprint(auth_blueprint, url_prefix='/auth')
+app.register_blueprint(api_v1_users_blueprint, url_prefix='/api/v1')
 
 @app.before_first_request
 def create_tables():
