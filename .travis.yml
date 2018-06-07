@@ -1,0 +1,14 @@
+os: linux
+sudo: false   # Uses sudo for e.g. binding the port but not for testing
+language: python
+python:
+  - 3.6
+cache: pip
+install: 
+  - pip install -r requirements.txt
+script:
+  - pytest
+  #- pylint --output-format=text webapp.py  # Check PEP-8 style
+  #- make html                              # Sphinx documentation
+
+
